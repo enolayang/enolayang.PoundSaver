@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羊毛镑 PoundSaver | 小羊肖恩的换汇口袋书</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <style>
+        body { background-color: #fefce8; }
+        .cream-card { 
+            background: #ffffff; 
+            border: 2px solid #fef3c7; 
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.1), 0 8px 10px -6px rgba(245, 158, 11, 0.05);
+        }
+        .cream-input {
+            background-color: #fffbeb;
+            border: 2px solid #fde68a;
+        }
+        .cream-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+            background-color: #ffffff;
+        }
+        .shaun-bounce {
+            animation: shaunJump 2s infinite ease-in-out;
+        }
+        @keyframes shaunJump {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+        }
+
+        .btn-vote-up {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-vote-up:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 10px 20px -3px rgba(16, 185, 129, 0.4);
+        }
+        .btn-vote-down {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-vote-down:hover {
+            transform: translateY(4px) scale(1.03);
+            box-shadow: 0 10px 20px -3px rgba(244, 63, 94, 0.4);
+        }
+
+        .pulse-glow-up {
+            animation: pulseGlowGreen 1.5s infinite alternate;
+        }
+        .pulse-glow-down {
+            animation: pulseGlowRed 1.5s infinite alternate;
+        }
+        @keyframes pulseGlowGreen {
+            0% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.3); }
+            100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.7); }
+        }
+        @keyframes pulseGlowRed {
+            0% { box-shadow: 0 0 5px rgba(244, 63, 94, 0.3); }
+            100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.7); }
+        }
+
+        .trend-line-path {
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
+            animation: drawLine 0.8s ease-out forwards;
+        }
+        .splash-3d { perspective: 1200px; }
+        .splash-card-3d { transform-style: preserve-3d; animation: floatCard 5s ease-in-out infinite; box-shadow: 0 30px 60px -20px rgba(120,53,15,.35), 0 12px 25px -10px rgba(245,158,11,.3); }
+        .splash-card-3d::before { content:""; position:absolute; inset:10px; border-radius:20px; border:1px solid rgba(255,255,255,.7); pointer-events:none; transform:translateZ(18px); }
+        @keyframes floatCard { 0%,100%{transform:rotateX(2deg) rotateY(-2deg) translateY(0)} 50%{transform:rotateX(-2deg) rotateY(2deg) translateY(-10px)} }
+        .cover-depth { transform:translateZ(42px); filter:drop-shadow(0 14px 8px rgba(120,53,15,.2)); }
+        .coin-3d { position:absolute; z-index:20; font-size:42px; transform:translateZ(75px); animation:coinFloat 3s ease-in-out infinite; filter:drop-shadow(0 12px 5px rgba(120,53,15,.25)); }
+        .coin-a { right:8%; top:12%; } .coin-b { left:7%; bottom:18%; animation-delay:1.2s; font-size:34px; }
+        @keyframes coinFloat { 0%,100%{transform:translateZ(75px) translateY(0) rotate(-8deg)} 50%{transform:translateZ(95px) translateY(-16px) rotate(12deg)} }
+        .cream-card { transition:transform .25s ease, box-shadow .25s ease; }
+        .cream-card:hover { transform:translateY(-3px); box-shadow:0 16px 30px -12px rgba(180,83,9,.22); }
+        button { transition:transform .2s ease, filter .2s ease, box-shadow .2s ease; }
+        button:hover { filter:saturate(1.08); }
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+</head>
+<body class="text-amber-950 font-sans antialiased min-h-screen pb-12 overflow-x-hidden">
+
+    <!-- 🌟 全屏欢迎封面遮罩层 (Splash Screen) -->
+    <div id="welcome-splash" class="fixed inset-0 z-50 bg-gradient-to-br from-amber-400 via-amber-300 to-orange-400 flex items-center justify-center p-6 transition-opacity duration-700 splash-3d">
+        <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-white/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-12 -top-12 w-80 h-80 bg-amber-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="bg-white/90 backdrop-blur-md border-4 border-white max-w-lg w-full p-8 sm:p-10 rounded-3xl shadow-2xl text-center space-y-6 relative z-10 splash-card-3d">
+            <span class="coin-3d coin-a">🪙</span><span class="coin-3d coin-b">💷</span>
+            <div class="text-7xl shaun-bounce inline-block cover-depth">🐑🕶️</div>
+            
+            <div class="space-y-2">
+                <span class="text-xs font-black bg-amber-100 text-amber-800 px-3 py-1 rounded-full uppercase tracking-wider">
+                    ✨ PoundSaver PRO
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-black text-amber-950 tracking-tight">
+                    欢迎来到薅羊毛镑的世界
+                </h1>
+                <p class="text-sm font-bold text-amber-800 font-mono">
+                    Welcome to PoundSaver World
+                </p>
+            </div>
+
+            <p class="text-xs sm:text-sm text-amber-900/80 leading-relaxed">
+                和小羊肖恩一起智能盯盘、分批换汇、锁定最低均价，把英镑汇率波动变成你的专属羊毛！
+            </p>
+
+            <div class="pt-2">
+                <button onclick="enterMainApp()" class="w-full bg-amber-500 hover:bg-amber-600 text-amber-950 font-black py-3.5 rounded-2xl text-sm shadow-lg shadow-amber-500/30 transition transform active:scale-95 flex items-center justify-center gap-2">
+                    <span>🚀</span> 点击进入换汇口袋书
+                </button>
+            </div>
+
+            <div class="text-[11px] text-amber-600 font-medium">
+                💡 实时汇率同步中，助你精准把握每一次换汇良机
+            </div>
+        </div>
+    </div>
+
+    <!-- 顶栏导航 -->
+    <nav class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-amber-200/60">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="font-black text-xl text-amber-600 flex items-center gap-2">
+                <span class="text-3xl shaun-bounce inline-block">🐑</span> 
+                <span>羊毛镑 PoundSaver</span>
+                <span class="text-xs px-2.5 py-0.5 bg-amber-100 text-amber-700 rounded-full font-bold">PRO 智能版</span>
+            </div>
+            
+            <!-- 顶部群体切换按钮 + 重置按钮 -->
+            <div class="flex items-center gap-2">
+                <div class="hidden sm:flex items-center gap-1.5 bg-amber-200/50 p-1 rounded-2xl text-xs font-bold">
+                    <button id="tab-student" onclick="switchUserTab('student')" class="px-3 py-1.5 rounded-xl transition bg-amber-400 text-amber-950 font-black shadow-sm">🎓 留学生专属</button>
+                    <button id="tab-haitao" onclick="switchUserTab('haitao')" class="px-3 py-1.5 rounded-xl transition text-amber-800 hover:bg-amber-200/50">🛍️ 海淘党专属</button>
+                    <button id="tab-travel" onclick="switchUserTab('travel')" class="px-3 py-1.5 rounded-xl transition text-amber-800 hover:bg-amber-200/50">✈️ 旅游刷卡专属</button>
+                </div>
+                <button onclick="resetUserData()" title="重置账号/清除数据" class="bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold px-2.5 py-1.5 rounded-xl text-xs transition border border-rose-300">
+                    🔄 重新开始
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 py-6 space-y-6">
+
+        <!-- ============================== 🐑 核心仪表盘（三个群体共用，仅顶部文案随标签切换） ============================== -->
+        <div id="shared-dashboard" class="space-y-6">
+            <!-- 肖恩羊圈状态栏 -->
+            <div class="cream-card p-5 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="relative w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border-2 border-amber-300 overflow-visible shrink-0 group cursor-pointer" title="点击更换或自定义头像">
+                        <div id="user-avatar-bg" class="w-full h-full rounded-xl flex items-center justify-center bg-amber-50 text-2xl overflow-hidden">
+                            🐑
+                        </div>
+                        <span class="absolute -top-1.5 -left-1.5 text-xl filter drop-shadow(0 2px 2px rgba(0,0,0,0.2)) rotate(-10deg) z-10">
+                            🕶️
+                        </span>
+                        <span class="absolute -bottom-2 -right-2 text-2xl filter drop-shadow(0 2px 4px rgba(0,0,0,0.2)) z-10 transition transform group-hover:scale-110">
+                            🐑
+                        </span>
+                        <input type="file" id="avatar-file-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" onchange="handleCustomAvatar(event)">
+                    </div>
+
+                    <div>
+                        <h2 class="font-black text-base text-amber-900" id="shaun-status">
+                            🎓 肖恩正背着书包，帮你盯着学费/生活费大额换汇！
+                        </h2>
+                        <p class="text-xs text-amber-700/80 mt-0.5" id="scene-desc">
+                            学费金额大，分批建仓拉低均价是关键！
+                        </p>
+                    </div>
+                </div>
+                <button onclick="triggerCoinEffect(event)" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-black px-4 py-2.5 rounded-2xl text-xs shadow-md shadow-amber-400/30 transition transform active:scale-95 flex items-center gap-1.5 shrink-0 w-full sm:w-auto justify-center">
+                    <span>🪙</span> 逗肖恩爆金币！
+                </button>
+            </div>
+
+            <!-- 省钱高光横幅 -->
+            <div id="achievement-banner" class="hidden bg-emerald-100 border-2 border-emerald-300 p-4 rounded-3xl flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🎉</span>
+                    <span class="text-xs font-bold text-emerald-900" id="achievement-title">
+                        肖恩帮你从汇率波动里薅到了羊毛！
+                    </span>
+                </div>
+                <span class="text-xs font-black text-emerald-700 bg-white px-3 py-1 rounded-full border border-emerald-200">大获全胜</span>
+            </div>
+
+            <!-- 主双栏 -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- 左侧 (占 8 列) -->
+                <div class="lg:col-span-8 space-y-6">
+
+                    <!-- 账本看板 -->
+                    <div class="cream-card p-6 rounded-3xl space-y-6">
+                        <div class="flex justify-between items-center border-b border-amber-100 pb-4">
+                            <h2 class="font-black text-base text-amber-900 flex items-center gap-2">
+                                <span>🧺</span> 肖恩的羊毛账本
+                            </h2>
+                            <span class="text-[11px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                                实时汇率: <strong id="rate-cny" class="font-mono text-amber-800">--.--</strong>
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                                <div class="text-[11px] font-bold text-amber-700">累计换汇</div>
+                                <div class="text-base font-black font-mono text-amber-950 mt-1" id="stat-total-gbp">£0.00</div>
+                            </div>
+                            <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                                <div class="text-[11px] font-bold text-amber-700">折合人民币</div>
+                                <div class="text-base font-black font-mono text-amber-950 mt-1" id="stat-total-cny">¥0.00</div>
+                            </div>
+                            <div class="bg-amber-100/80 p-3.5 rounded-2xl border border-amber-300">
+                                <div class="text-[11px] font-bold text-amber-800">持仓加权均价</div>
+                                <div class="text-lg font-black font-mono text-amber-900 mt-0.5" id="stat-avg-rate">0.0000</div>
+                            </div>
+                            <div class="bg-amber-50/60 p-3.5 rounded-2xl border border-amber-100">
+                                <div class="text-[11px] font-bold text-amber-700">战果评估</div>
+                                <div class="text-base font-black font-mono text-slate-400 mt-1" id="stat-diff">--</div>
+                            </div>
+                        </div>
+
+                        <!-- 目标价预警设置栏 -->
+                        <div class="bg-amber-100/60 p-3.5 rounded-2xl border border-amber-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 text-xs font-black text-amber-900">
+                                <span>🚨</span> 心理目标价预警:
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="number" step="0.0001" id="input-target-price" placeholder="如 9.05" class="cream-input rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-amber-900 w-full sm:w-32">
+                                <button onclick="saveTargetPrice()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-3 py-1.5 rounded-xl text-xs shadow-sm transition shrink-0">
+                                    开启盯盘
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="visual-impact-card" class="hidden bg-orange-50 border-2 border-orange-200 p-4 rounded-2xl space-y-2">
+                            <div class="flex items-center justify-between text-xs font-black text-orange-800">
+                                <span>💡 羊毛战果换算器</span>
+                                <button onclick="openShareModal()" class="bg-orange-400 hover:bg-orange-500 text-white font-bold px-3 py-1 rounded-xl text-[11px] shadow-sm transition">
+                                    📸 生成朋友圈海报
+                                </button>
+                            </div>
+                            <div class="text-xs text-orange-950 leading-relaxed font-medium" id="visual-impact-text">--</div>
+                        </div>
+
+                        <div class="bg-amber-50/80 p-4 rounded-2xl border border-amber-200 space-y-2">
+                            <div class="text-xs font-black text-amber-900">喂给肖恩一笔新账单 🌾</div>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <label class="text-[11px] font-black text-amber-800">换汇金额（£）<input type="number" id="input-gbp" placeholder="如 1000" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono font-bold text-amber-900"></label>
+                                <label class="text-[11px] font-black text-amber-800">成交汇率<input type="number" step="0.0001" id="input-rate" placeholder="如 9.15" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono font-bold text-amber-900"></label>
+                                <button onclick="addRecord(event)" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-black py-2 rounded-xl text-xs shadow-sm transition">
+                                    存入仓库 +
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-amber-900 font-medium">
+                                <thead class="border-b border-amber-100 text-amber-700">
+                                    <tr>
+                                        <th class="py-2 px-3">金额 (£)</th>
+                                        <th class="py-2 px-3">日期</th>
+                                        <th class="py-2 px-3">成交汇率</th>
+                                        <th class="py-2 px-3">花费 (¥)</th>
+                                        <th class="py-2 px-3 text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="records-table-body" class="divide-y divide-amber-100/60"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 多周期趋势图 + 均线 -->
+                    <div class="cream-card p-5 rounded-3xl space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-100 pb-3">
+                            <h3 class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                                <span>📈</span> 汇率长周期大势与移动平均线 (MA5)
+                            </h3>
+                            <div class="flex items-center gap-1 bg-amber-100/70 p-1 rounded-xl text-[11px] font-bold overflow-x-auto">
+                                <button onclick="switchTrendPeriod('7d')" id="period-7d" class="px-2.5 py-1 rounded-lg transition bg-amber-400 text-amber-950 whitespace-nowrap">7日</button>
+                                <button onclick="switchTrendPeriod('30d')" id="period-30d" class="px-2.5 py-1 rounded-lg transition text-amber-800 hover:bg-amber-200/50 whitespace-nowrap">30日</button>
+                                <button onclick="switchTrendPeriod('3m')" id="period-3m" class="px-2.5 py-1 rounded-lg transition text-amber-800 hover:bg-amber-200/50 whitespace-nowrap">3个月</button>
+                                <button onclick="switchTrendPeriod('6m')" id="period-6m" class="px-2.5 py-1 rounded-lg transition text-amber-800 hover:bg-amber-200/50 whitespace-nowrap">6个月</button>
+                                <button onclick="switchTrendPeriod('1y')" id="period-1y" class="px-2.5 py-1 rounded-lg transition text-amber-800 hover:bg-amber-200/50 whitespace-nowrap">1年</button>
+                            </div>
+                        </div>
+                        <!-- 均线参数调节控制栏 -->
+                        <div class="flex items-center gap-3 bg-amber-50/70 p-2.5 rounded-2xl border border-amber-200 text-xs font-bold text-amber-900">
+                            <span>📊 均线周期设置：</span>
+                            <button onclick="setMAPeriod(3)" id="ma-btn-3" class="px-2.5 py-1 rounded-lg bg-amber-400 text-amber-950 transition">MA3</button>
+                            <button onclick="setMAPeriod(5)" id="ma-btn-5" class="px-2.5 py-1 rounded-lg text-amber-800 hover:bg-amber-200/50 transition">MA5</button>
+                            <button onclick="setMAPeriod(10)" id="ma-btn-10" class="px-2.5 py-1 rounded-lg text-amber-800 hover:bg-amber-200/50 transition">MA10</button>
+                        </div>
+                        <div id="chart-trend" class="h-64 w-full"></div>
+                    </div>
+
+                </div>
+
+                <!-- 右侧 (占 4 列) -->
+                <div class="lg:col-span-4 space-y-6">
+
+                    <!-- 雷达 -->
+                    <div class="cream-card p-5 rounded-3xl space-y-3">
+                        <div class="flex items-center justify-between border-b border-amber-100 pb-2">
+                            <div class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                                <span>🎯</span> 肖恩的时机评估雷达
+                            </div>
+                        </div>
+                        <div id="chart-radar" class="h-48 w-full"></div>
+                        <div class="text-[11px] font-bold text-amber-800 text-center bg-amber-50 p-2 rounded-xl border border-amber-200">
+                            今日适宜指数：<strong id="radar-composite-score" class="text-orange-600 font-mono text-sm">-- 分</strong>
+                        </div>
+                        <div id="radar-composite-note" class="text-[10px] text-amber-500 text-center"></div>
+                    </div>
+
+                    <!-- 跟着肖恩猜涨跌（含牧羊币入口） -->
+                    <div class="cream-card p-5 rounded-3xl space-y-4 relative">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                                    <span>🥊</span> 跟着肖恩猜涨跌
+                                </div>
+                                <p class="text-[11px] text-amber-700/80 mt-1">预测明天走势，赚取牧羊币！</p>
+                            </div>
+                            <!-- 🪙 牧羊币快捷入口按钮 -->
+                            <button onclick="openWoolShop()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-black px-3 py-1.5 rounded-2xl text-xs flex items-center gap-1 transition shadow-sm active:scale-95">
+                                <span>🪙</span> 牧羊币: <strong id="wool-coins" class="font-mono text-orange-600">0</strong>
+                            </button>
+                        </div>
+
+                        <div id="vote-status" class="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-center transition-all duration-300">
+                            今天还没有预测哦
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="btn-up" onclick="vote('up', event)" class="btn-vote-up bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-2xl text-xs shadow-md flex items-center justify-center gap-1.5 relative">
+                                <span class="arrow-up inline-block text-base font-black">▲</span> 看涨英镑
+                            </button>
+                            <button id="btn-down" onclick="vote('down', event)" class="btn-vote-down bg-rose-500 hover:bg-rose-600 text-white font-black py-3 rounded-2xl text-xs shadow-md flex items-center justify-center gap-1.5 relative">
+                                <span class="arrow-down inline-block text-base font-black">▼</span> 看跌英镑
+                            </button>
+                        </div>
+
+                        <div class="border-t border-amber-100 pt-3 flex justify-between text-xs font-bold text-amber-800">
+                            <span>连续打卡: <strong id="streak-count" class="text-orange-600 font-mono">1</strong> 天</span>
+                            <span>头衔: <strong class="text-emerald-700" id="user-title">牧羊新手</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- 🌾 肖恩的牧场养成与打卡进度 -->
+                    <div class="cream-card p-5 rounded-3xl space-y-4 shadow-sm border-2 border-amber-300 bg-amber-50/80">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                                    <span>🏡</span> 肖恩的牧场养成
+                                </div>
+                                <p class="text-[11px] text-amber-700/80 mt-1">当前牧场等级：<strong id="farm-level-name" class="text-orange-600">小型羊圈 🛖</strong></p>
+                            </div>
+                            <button onclick="openCheckinModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-3.5 py-1.5 rounded-2xl text-xs flex items-center gap-1 transition shadow-sm active:scale-95">
+                                <span>✨</span> 查看打卡战报
+                            </button>
+                        </div>
+
+                        <!-- 牧场进度条 -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-[11px] font-bold text-amber-800">
+                                <span>距离下一级豪华牧场</span>
+                                <span id="farm-progress-text">1 / 100 天</span>
+                            </div>
+                            <div class="w-full bg-amber-200/60 h-3 rounded-full overflow-hidden p-0.5 border border-amber-300">
+                                <div id="farm-progress-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 1%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 汇率列表 -->
+                    <div class="cream-card p-5 rounded-3xl space-y-3">
+                        <div class="text-xs font-black text-amber-900 border-b border-amber-100 pb-2">国际汇率一览</div>
+                        <div class="space-y-2 text-xs font-bold">
+                            <div class="flex justify-between bg-amber-50/60 p-2.5 rounded-xl border border-amber-100">
+                                <span class="text-amber-700">GBP / USD (美元)</span>
+                                <span class="font-mono text-amber-900" id="rate-usd">--.--</span>
+                            </div>
+                            <div class="flex justify-between bg-amber-50/60 p-2.5 rounded-xl border border-amber-100">
+                                <span class="text-amber-700">GBP / EUR (欧元)</span>
+                                <span class="font-mono text-amber-900" id="rate-eur">--.--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================== 🎓 留学生专属工具区 ============================== -->
+        <div id="panel-student-extra" class="space-y-6">
+            <div class="flex items-center gap-2 px-1"><span class="text-lg">🎓</span><h2 class="text-sm font-black text-amber-900">留学生专属工具</h2><span class="text-[11px] text-amber-600 font-bold">大额学费/生活费换汇，分批规划更安心</span></div>
+
+            <div class="cream-card p-6 rounded-3xl space-y-5">
+                <div class="text-5xl">🎓</div>
+                <div><h2 class="text-xl font-black text-amber-900">学费/大额支出分批换汇规划器</h2><p class="text-xs text-amber-700/80 mt-1">把一大笔学费拆成几批，用时间换风险，避免一次性买在高点。</p></div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <label class="text-xs font-black text-amber-800">总需换汇（£）<input id="tuition-total" type="number" placeholder="如 15000" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">计划分几批换<input id="tuition-batches" type="number" value="3" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">缴费截止还剩几天<input id="tuition-days-left" type="number" placeholder="选填，如 45" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                </div>
+                <button onclick="calcTuitionPlan()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-4 py-2 rounded-xl text-xs">生成分批计划</button>
+                <div id="tuition-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-sm font-bold text-emerald-900 leading-relaxed"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="cream-card p-5 rounded-3xl space-y-3">
+                    <h3 class="font-black text-sm text-amber-900">🚦 今日汇率位置</h3>
+                    <p class="text-[11px] text-amber-700/80">当前汇率相对近30天区间处于什么位置，不是预测，仅供参考。</p>
+                    <div id="rate-gauge-result" class="hidden"></div>
+                </div>
+                <div class="cream-card p-5 rounded-3xl space-y-4">
+                    <h3 class="font-black text-sm text-amber-900">🧮 年度购汇额度小助手</h3>
+                    <p class="text-[11px] text-amber-700/80">个人年度购汇额度约合5万美元，大额换汇前心里有个数。</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="text-[11px] font-black text-amber-800">本年度已购汇（¥）<input id="quota-used" type="number" placeholder="如 100000" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                        <label class="text-[11px] font-black text-amber-800">本次计划换汇（£）<input id="quota-this-time" type="number" placeholder="如 15000" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    </div>
+                    <button onclick="calcQuota()" class="w-full bg-amber-400 text-amber-950 font-black py-2 rounded-xl text-xs">查看剩余额度</button>
+                    <div id="quota-result" class="hidden text-xs font-bold rounded-xl p-3"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="cream-card p-5 rounded-3xl">
+                    <div id="battle-report-card">
+                        <h3 class="font-black text-sm text-amber-900">🏆 我的换汇战报</h3>
+                        <p class="text-[11px] text-amber-700/80 mt-1">记满账单后自动生成，跟"如果全部在近30天高点换清"比一比。</p>
+                        <p class="text-xs text-amber-600 mt-3">还没有换汇记录，先去上面的账本记一笔吧～</p>
+                    </div>
+                </div>
+                <div class="cream-card p-5 rounded-3xl space-y-3">
+                    <h3 class="font-black text-sm text-amber-900">🎓 留学换汇提醒清单</h3>
+                    <label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox" class="accent-amber-500"> 关注学校缴费截止日期，避免临近到期仓促换汇</label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox" class="accent-amber-500"> 保留每笔换汇水单，方便日后资金来源证明</label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox" class="accent-amber-500"> 大额换汇优先走银行柜台/大额专线，避免线上限额卡单</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================== 🛍️ 海淘党专属工具区 ============================== -->
+        <div id="panel-haitao" class="space-y-6 hidden">
+            <div class="flex items-center gap-2 px-1"><span class="text-lg">🛍️</span><h2 class="text-sm font-black text-amber-900">海淘党专属工具</h2><span class="text-[11px] text-amber-600 font-bold">折扣叠加汇率，算清到手价才是真省钱</span></div>
+            <div class="cream-card p-6 rounded-3xl space-y-5">
+                <div class="text-5xl">🛍️</div>
+                <div><h2 class="text-xl font-black text-amber-900">海淘到手价计算器</h2><p class="text-xs text-amber-700 mt-1">把折扣、运费和税费一次算清，避免“看着便宜买完贵”。</p></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <label class="text-xs font-black text-amber-800">商品原价（£）<input id="haitao-price" type="number" placeholder="如 49.99" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">折扣（%）<input id="haitao-discount" type="number" value="100" placeholder="100=不打折" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">国际运费（£）<input id="haitao-shipping" type="number" value="0" placeholder="没有则填 0" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">预估税费（%）<input id="haitao-tax" type="number" value="0" placeholder="免税则填 0" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                </div>
+                <button onclick="calcHaitao()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-4 py-2 rounded-xl text-xs">计算到手价</button>
+                <div id="haitao-result" class="hidden bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 text-sm font-bold text-emerald-900"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200"><div class="text-xs font-bold text-amber-800">支付提醒</div><div class="text-sm font-black text-rose-600 mt-1">优先选 GBP 结算</div></div>
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200"><div class="text-xs font-bold text-amber-800">热门折扣码</div><div class="text-sm font-black text-orange-600 mt-1">UKDEAL85 · 85折</div></div>
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200"><div class="text-xs font-bold text-amber-800">免税小贴士</div><div class="text-sm font-black text-amber-950 mt-1">保留订单与物流凭证</div></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="cream-card p-5 rounded-3xl space-y-4"><h3 class="font-black text-sm text-amber-900">🧾 海淘订单看板</h3><div class="grid grid-cols-2 gap-3"><input id="haitao-order-name" placeholder="商品名称" class="cream-input rounded-xl px-3 py-2 text-xs"><input id="haitao-order-amount" type="number" placeholder="金额 £" class="cream-input rounded-xl px-3 py-2 text-xs font-mono"></div><button onclick="addHaitaoOrder()" class="w-full bg-amber-400 text-amber-950 font-black py-2 rounded-xl text-xs">+ 记录订单</button><div id="haitao-orders" class="space-y-2 text-xs"></div></div><div class="cream-card p-5 rounded-3xl space-y-3"><h3 class="font-black text-sm text-amber-900">📦 海淘提醒清单</h3><label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox" class="accent-amber-500"> 关注物流并保留签收凭证</label><label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox" class="accent-amber-500"> 核对退货期限与免邮条件</label><label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox" class="accent-amber-500"> 记录最终汇率和手续费</label></div></div>
+        </div>
+
+        <!-- ============================== ✈️ 旅游刷卡专属工具区 ============================== -->
+        <div id="panel-travel" class="space-y-6 hidden">
+            <div class="flex items-center gap-2 px-1"><span class="text-lg">✈️</span><h2 class="text-sm font-black text-amber-900">旅游刷卡专属工具</h2><span class="text-[11px] text-amber-600 font-bold">提前规划预算，刷卡坚持选英镑</span></div>
+            <div class="cream-card p-6 rounded-3xl space-y-5">
+                <div class="text-5xl">✈️</div>
+                <div><h2 class="text-xl font-black text-amber-900">游客旅行预算与刷卡助手</h2><p class="text-xs text-amber-700 mt-1">按天估算预算，出发前锁定换汇金额；消费时记得拒绝 DCC。</p></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <label class="text-xs font-black text-amber-800">旅行天数<input id="travel-days" type="number" value="5" placeholder="如 5" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">每日消费预算（£）<input id="travel-daily" type="number" value="80" placeholder="如 80" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <label class="text-xs font-black text-amber-800">备用现金（£）<input id="travel-cash" type="number" value="80" placeholder="如 80" class="cream-input mt-1 w-full rounded-xl px-3 py-2 text-xs font-mono"></label>
+                    <button onclick="calcTravel()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-3 py-2 rounded-xl text-xs">生成预算</button>
+                </div>
+                <div id="travel-result" class="hidden bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 text-sm font-bold text-sky-900"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                        <div class="text-xs font-bold text-amber-800">DCC防坑指南</div>
+                        <div class="text-lg font-black text-rose-600 mt-1">坚持选择英镑(GBP)结算</div>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                        <div class="text-xs font-bold text-amber-800">牡蛎卡 (Oyster) 充值</div>
+                        <div class="text-lg font-black text-amber-950 mt-1">绑定Apple Pay最划算</div>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                        <div class="text-xs font-bold text-amber-800">随身现金建议</div>
+                        <div class="text-lg font-black text-amber-950 mt-1">备 £50-£100 零钱即可</div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="cream-card p-5 rounded-3xl space-y-4"><h3 class="font-black text-sm text-amber-900">🗺️ 行程花费分配</h3><div class="grid grid-cols-3 gap-2"><label class="text-[11px] font-black text-amber-800">餐饮占比（%）<input id="travel-food" type="number" value="35" class="cream-input mt-1 w-full rounded-xl px-2 py-2 text-xs"></label><label class="text-[11px] font-black text-amber-800">交通占比（%）<input id="travel-transport" type="number" value="25" class="cream-input mt-1 w-full rounded-xl px-2 py-2 text-xs"></label><label class="text-[11px] font-black text-amber-800">门票占比（%）<input id="travel-ticket" type="number" value="40" class="cream-input mt-1 w-full rounded-xl px-2 py-2 text-xs"></label></div><button onclick="calcTravelSplit()" class="w-full bg-sky-500 text-white font-black py-2 rounded-xl text-xs">生成分类预算</button><div id="travel-split-result" class="hidden bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs font-bold text-sky-900"></div></div><div class="cream-card p-5 rounded-3xl space-y-3"><h3 class="font-black text-sm text-amber-900">✅ 出发前检查</h3><label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox"> 开通境外支付 / 短信提醒</label><label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox"> 下载离线地图与电子机票</label><label class="flex items-center gap-2 text-xs font-bold text-amber-800"><input type="checkbox"> 兑换零钱，刷卡统一选 GBP</label></div></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="cream-card p-5 rounded-3xl"><h3 class="font-black text-sm text-amber-900 mb-3">💱 DCC 损失计算器</h3><div class="grid grid-cols-2 gap-3"><label class="text-xs font-bold">消费金额（£）<input id="dcc-gbp" type="number" value="100" class="cream-input mt-1 w-full rounded-xl px-3 py-2"></label><label class="text-xs font-bold">商家人民币汇率<input id="dcc-rate" type="number" value="9.5" step="0.0001" class="cream-input mt-1 w-full rounded-xl px-3 py-2"></label></div><button onclick="calcDcc()" class="mt-3 bg-rose-500 text-white font-black px-4 py-2 rounded-xl text-xs">计算多花多少钱</button><div id="dcc-result" class="text-xs font-bold text-rose-700 mt-2"></div></div>
+                <div class="cream-card p-5 rounded-3xl"><h3 class="font-black text-sm text-amber-900 mb-3">💳 支付方式比较</h3><div class="grid grid-cols-3 gap-2"><label class="text-[11px] font-bold">银行卡费率 %<input id="pay-bank" type="number" value="1.5" class="cream-input mt-1 w-full rounded-xl px-2 py-2 text-xs"></label><label class="text-[11px] font-bold">PayPal费率 %<input id="pay-paypal" type="number" value="3.5" class="cream-input mt-1 w-full rounded-xl px-2 py-2 text-xs"></label><label class="text-[11px] font-bold">汇率加价 %<input id="pay-markup" type="number" value="0.5" class="cream-input mt-1 w-full rounded-xl px-2 py-2 text-xs"></label></div><button onclick="comparePay()" class="mt-3 bg-amber-500 text-white font-black px-4 py-2 rounded-xl text-xs">比较哪种更省</button><div id="pay-result" class="text-xs font-bold text-emerald-700 mt-2"></div></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 目标价预警达成弹窗 Modal -->
+    <div id="alert-modal" class="fixed inset-0 bg-amber-950/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-orange-400 max-w-sm w-full p-6 rounded-3xl space-y-4 text-center relative shadow-2xl">
+            <div class="text-5xl shaun-bounce inline-block">🚨🐑</div>
+            <div class="space-y-1">
+                <div class="text-lg font-black text-orange-600">羊毛预警：触发目标价！</div>
+                <div class="text-xs text-amber-800" id="alert-msg">当前英镑已跌破你设定的目标心理价，快去银行或钱包准备换汇！</div>
+            </div>
+            <div class="bg-orange-50 p-3 rounded-2xl border border-orange-200 text-xs font-bold text-orange-900">
+                当前最新市价：<span id="alert-current-rate" class="font-mono text-base text-rose-600">0.0000</span>
+            </div>
+            <button onclick="closeAlertModal()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-2.5 rounded-2xl text-xs shadow-md transition">
+                收到，马上行动！🏃
+            </button>
+        </div>
+    </div>
+
+    <!-- 海报 Modal -->
+    <div id="share-modal" class="fixed inset-0 bg-amber-950/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-amber-300 max-w-xs w-full p-6 rounded-3xl space-y-4 text-center relative shadow-2xl">
+            <button onclick="closeShareModal()" class="absolute top-4 right-4 text-amber-400 hover:text-amber-700 font-black text-base">✕</button>
+            <div class="space-y-1">
+                <div class="text-4xl shaun-bounce inline-block">🐑</div>
+                <div class="text-base font-black text-amber-900">肖恩的羊毛战报</div>
+                <div class="text-[10px] text-amber-600 font-mono" id="card-date">2026-08-30</div>
+            </div>
+            <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2 text-left text-xs font-bold text-amber-900">
+                <div>换汇总额：<span id="card-gbp" class="font-mono text-amber-700">£0</span></div>
+                <div>加权成本：<span id="card-cost" class="font-mono text-amber-700">0.0000</span></div>
+                <div>战果评估：<span id="card-result" class="font-mono text-emerald-600">--</span></div>
+                <div class="border-t border-amber-200 pt-2 text-[11px] text-amber-800 leading-relaxed font-normal" id="card-impact">--</div>
+            </div>
+            <div class="text-[10px] text-amber-600 font-bold">💡 截图分享给朋友，看看谁是农场最会算账的人！</div>
+        </div>
+    </div>
+
+    <!-- 🪙 牧羊币商店与资产弹窗 -->
+    <div id="wool-shop-modal" class="fixed inset-0 bg-amber-950/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-amber-300 max-w-sm w-full p-6 rounded-3xl space-y-4 text-center relative shadow-2xl">
+            <button onclick="closeWoolShop()" class="absolute top-4 right-4 text-amber-400 hover:text-amber-700 font-black text-base">✕</button>
+            <div class="text-4xl shaun-bounce inline-block">🪙🐑</div>
+            <div class="space-y-1">
+                <div class="text-base font-black text-amber-900">肖恩的牧羊币仓库</div>
+                <div class="text-xs text-amber-700">当前拥有：<strong id="modal-wool-coins" class="font-mono text-orange-600 text-sm">0</strong> 枚牧羊币</div>
+            </div>
+
+            <div class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-3 text-left text-xs font-bold text-amber-900">
+                <div class="text-[11px] text-amber-800 font-black border-b border-amber-200 pb-1">🎁 专属权益兑换：</div>
+                
+                <div class="flex items-center justify-between">
+                    <span>🕶️ 解锁肖恩炫酷墨镜皮肤</span>
+                    <button onclick="exchangeSkin(50)" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-xl text-[10px] shadow-sm">50币兑换</button>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span>📸 解锁高级战报海报背景</span>
+                    <button onclick="exchangeSkin(100)" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-xl text-[10px] shadow-sm">100币兑换</button>
+                </div>
+            </div>
+
+            <div class="text-[10px] text-amber-600 font-medium">
+                💡 坚持每日参与猜涨跌和记账，即可获取更多牧羊币！
+            </div>
+        </div>
+    </div>
+
+    <!-- 📸 每日打卡金句战报弹窗 -->
+    <div id="checkin-modal" class="fixed inset-0 bg-amber-950/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white border-4 border-amber-300 max-w-sm w-full p-6 rounded-3xl space-y-4 text-center relative shadow-2xl">
+            <button onclick="closeCheckinModal()" class="absolute top-4 right-4 text-amber-400 hover:text-amber-700 font-black text-base">✕</button>
+            
+            <div class="text-3xl shaun-bounce inline-block">🐑✨</div>
+            
+            <div class="space-y-1">
+                <div class="text-base font-black text-amber-900">今日肖恩金句战报</div>
+                <div class="text-[11px] text-amber-600">连续打卡 <strong id="modal-streak" class="text-orange-600 font-mono">1</strong> 天</div>
+            </div>
+
+            <!-- 随机金句展示区 -->
+            <div class="bg-amber-50 p-4 rounded-2xl border border-amber-200 space-y-2 text-center">
+                <div class="text-xs font-black text-amber-900" id="quote-title">💡 汇率避坑指南</div>
+                <div class="text-xs text-amber-700 font-medium leading-relaxed" id="quote-content">
+                    “今日英镑小跌，适合小酌一杯，但不适合大笔换汇哦！”
+                </div>
+            </div>
+
+            <button onclick="shareReport()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-2.5 rounded-2xl text-xs shadow-md transition active:scale-95">
+                📤 一键分享战报海报
+            </button>
+        </div>
+    </div>
+
+    <!-- 逻辑脚本 -->
+    <script>
+        let currentRateCNY = 9.1131;
+        let currentMode = 'student';
+        let trendChart = null;
+        let currentPeriod = '7d';
+        let currentMAPeriod = 3;
+        // 以下四项为"按身份隔离"的数据，实际取值由 loadPersonaState() 按当前身份读取
+        let records = [];
+        let targetPrice = 0;
+        let streak = 1;
+        let woolCoins = 0;
+
+        // 按身份生成独立的存储键：留学生/海淘党/旅游党的账本、目标价、打卡、牧羊币互不影响
+        function nsKey(base) {
+            return base + '_' + currentMode;
+        }
+
+        // 切换身份或初始加载时，从对应身份的存储里读出数据并刷新整个仪表盘
+        function loadPersonaState() {
+            records = JSON.parse(localStorage.getItem(nsKey('ps_records')) || '[]');
+            targetPrice = parseFloat(localStorage.getItem(nsKey('ps_target_price')) || '0');
+            streak = parseInt(localStorage.getItem(nsKey('ps_streak')) || '1');
+            woolCoins = parseInt(localStorage.getItem(nsKey('ps_wool_coins')) || '0');
+
+            const targetInput = document.getElementById('input-target-price');
+            if (targetInput) targetInput.value = targetPrice > 0 ? targetPrice : '';
+
+            renderRecords();
+            updateCalculations();
+            loadVoteState();
+            updateWoolCoinDisplay();
+            updateFarmProgress(streak);
+            renderBattleReport();
+            calcRateGauge();
+            renderRadarChart();
+        }
+
+        const trendDataMap = {
+            '7d': { labels: ['08-24', '08-25', '08-26', '08-27', '08-28', '08-29', '今日'], values: [9.08, 9.11, 9.15, 9.13, 9.19, 9.16, 9.1131], min: 9.0, max: 9.3 },
+            '30d': { labels: ['7月前', '7月中', '7月底', '08-05', '08-10', '08-15', '08-20', '08-25', '今日'], values: [9.06, 9.11, 9.09, 9.08, 9.11, 9.13, 9.16, 9.14, 9.1131], min: 8.95, max: 9.35 },
+            '3m': { labels: ['6月(期初)', '6月中', '6月底', '7月初', '7月中', '7月底', '8月初', '8月中', '今日'], values: [9.02, 8.93, 8.97, 9.06, 9.10, 9.09, 9.10, 9.16, 9.1131], min: 8.85, max: 9.35 },
+            '6m': { labels: ['3月', '4月上', '4月底', '5月上', '5月底', '6月', '7月', '8月中', '今日'], values: [9.19, 9.07, 9.28, 9.24, 9.10, 8.97, 9.09, 9.16, 9.1131], min: 8.80, max: 9.50 },
+            '1y': { labels: ['去年9月', '11月', '今年1月', '3月', '5月', '7月', '今日'], values: [9.35, 9.42, 9.42, 9.19, 9.10, 9.09, 9.1131], min: 8.70, max: 9.60 }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 恢复本地存储的自定义头像（头像属于"人"本身，三个身份共用，不隔离）
+            const savedAvatar = localStorage.getItem('ps_user_avatar');
+            if (savedAvatar) {
+                applyAvatar(savedAvatar);
+            }
+
+            fetchRealtimeRates();
+            initTrendChart('7d');
+            initRadarChart();
+            switchUserTab('student');
+            renderHaitaoOrders();
+        });
+
+        // 三个群体共用同一套核心仪表盘（账本/趋势图/雷达/猜涨跌/牧场养成/汇率列表）
+        // 切换标签时更新顶部场景文案，并重新加载该身份独立保存的数据
+        const personaCopy = {
+            student: {
+                title: '🎓 肖恩正背着书包，帮你盯着学费/生活费大额换汇！',
+                desc: '学费金额大，分批建仓拉低均价是关键！'
+            },
+            haitao: {
+                title: '🛍️ 肖恩正在帮你盯着海淘好价！',
+                desc: '折扣叠加汇率，算清到手价才是真省钱！'
+            },
+            travel: {
+                title: '✈️ 肖恩陪你轻松玩转英国！',
+                desc: '提前规划预算，刷卡坚持选英镑，旅途更安心！'
+            }
+        };
+        function applyPersonaCopy(mode){
+            const info = personaCopy[mode]; if(!info) return;
+            const h = document.getElementById('shaun-status'); if(h) h.textContent = info.title;
+            const d = document.getElementById('scene-desc'); if(d) d.textContent = info.desc;
+        }
+
+        // 🌟 清除数据重置为新用户状态（只重置当前身份的数据，不影响其他两个身份）
+        function resetUserData() {
+            if (confirm('确定要清除【当前身份】的换汇账单、打卡记录和牧羊币，重新开始吗？（不影响其他身份的数据）')) {
+                localStorage.removeItem(nsKey('ps_records'));
+                localStorage.removeItem(nsKey('ps_target_price'));
+                localStorage.removeItem(nsKey('ps_streak'));
+                localStorage.removeItem(nsKey('ps_wool_coins'));
+                localStorage.removeItem(nsKey('ps_vote_today'));
+                if (currentMode === 'haitao') localStorage.removeItem('ps_haitao_orders');
+                location.reload();
+                location.reload();
+            }
+        }
+
+        // 🌟 点击封面按钮进入主功能区
+        function enterMainApp() {
+            const splash = document.getElementById('welcome-splash');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 700);
+            triggerCoinEffect();
+        }
+
+        // 切换专属工具区与按钮高亮函数
+        // 核心仪表盘（#shared-dashboard，即账本/趋势图/雷达/猜涨跌/牧场养成/汇率列表）
+        // 三个群体共用、始终显示，这里只切换"专属工具区"和顶部文案
+        function switchUserTab(type) {
+            currentMode = type;
+
+            const extraStudent = document.getElementById('panel-student-extra');
+            const extraHaitao = document.getElementById('panel-haitao');
+            const extraTravel = document.getElementById('panel-travel');
+
+            const tabStudent = document.getElementById('tab-student');
+            const tabHaitao = document.getElementById('tab-haitao');
+            const tabTravel = document.getElementById('tab-travel');
+
+            // 隐藏所有专属工具区
+            extraStudent.classList.add('hidden');
+            extraHaitao.classList.add('hidden');
+            extraTravel.classList.add('hidden');
+
+            // 恢复所有按钮默认样式
+            const inactiveStyle = "px-3 py-1.5 rounded-xl transition text-amber-800 hover:bg-amber-200/50";
+            const activeStyle = "px-3 py-1.5 rounded-xl transition bg-amber-400 text-amber-950 font-black shadow-sm";
+
+            if(tabStudent) tabStudent.className = inactiveStyle;
+            if(tabHaitao) tabHaitao.className = inactiveStyle;
+            if(tabTravel) tabTravel.className = inactiveStyle;
+
+            // 显示对应专属工具区并高亮按钮
+            if (type === 'student') {
+                extraStudent.classList.remove('hidden');
+                if(tabStudent) tabStudent.className = activeStyle;
+            } else if (type === 'haitao') {
+                extraHaitao.classList.remove('hidden');
+                if(tabHaitao) tabHaitao.className = activeStyle;
+            } else if (type === 'travel') {
+                extraTravel.classList.remove('hidden');
+                if(tabTravel) tabTravel.className = activeStyle;
+            }
+
+            applyPersonaCopy(type);
+            loadPersonaState();
+        }
+
+        // ===== 🎓 留学生专属工具 =====
+
+        // 学费/大额支出分批换汇规划器：结合近30天汇率区间，估算分批 vs 一次性换在高点的潜在差额
+        function calcTuitionPlan() {
+            const total = parseFloat(document.getElementById('tuition-total').value);
+            const batches = Math.max(1, parseInt(document.getElementById('tuition-batches').value) || 1);
+            const daysLeft = parseFloat(document.getElementById('tuition-days-left').value);
+            if (!total || total <= 0) { alert('请输入需要换汇的总金额！'); return; }
+
+            const perBatch = total / batches;
+            const data = trendDataMap['30d'];
+            const maxRate = Math.max(...data.values);
+            const minRate = Math.min(...data.values);
+            const midRate = (maxRate + minRate) / 2;
+            const worstOneOff = total * maxRate;
+            const batchEstimate = total * midRate;
+            const riskReduced = Math.max(0, ((worstOneOff - batchEstimate) / worstOneOff) * 100);
+
+            let intervalHint = '';
+            if (daysLeft && daysLeft > 0) {
+                const gapDays = Math.max(1, Math.floor(daysLeft / batches));
+                intervalHint = `建议每隔约 <strong>${gapDays}</strong> 天换一批，`;
+            }
+
+            const box = document.getElementById('tuition-result');
+            box.classList.remove('hidden');
+            box.innerHTML = `建议分 <strong>${batches}</strong> 批，每批约 <strong>£${perBatch.toFixed(2)}</strong>。${intervalHint}相比在近30天最高点（${maxRate.toFixed(4)}）一次性换清，分批操作有机会把成本波动风险降低约 <strong class="text-emerald-700">${riskReduced.toFixed(1)}%</strong>（基于近30天区间估算，仅供参考，不代表未来汇率走势）。`;
+        }
+
+        // 年度购汇额度小助手：个人年度购汇额度参考约5万美元等值人民币（示意值，实际以银行规定为准）
+        function calcQuota() {
+            const used = parseFloat(document.getElementById('quota-used').value) || 0;
+            const thisTime = parseFloat(document.getElementById('quota-this-time').value) || 0;
+            const quotaLimitCNY = 350000; // 约合5万美元的参考值，仅作示意
+            const thisTimeCNY = thisTime * currentRateCNY;
+            const remaining = quotaLimitCNY - used;
+            const afterThis = remaining - thisTimeCNY;
+
+            const box = document.getElementById('quota-result');
+            box.classList.remove('hidden');
+            if (afterThis < 0) {
+                box.className = 'text-xs font-bold rounded-xl p-3 text-rose-900 bg-rose-50 border border-rose-200';
+                box.innerHTML = `⚠️ 本次换汇约合 ¥${thisTimeCNY.toFixed(2)}，加上已用额度可能会超过年度购汇参考额度，建议分批处理或咨询银行。<div class="text-[10px] font-normal mt-1 opacity-80">*参考额度按约5万美元估算，实际以银行规定为准</div>`;
+            } else {
+                box.className = 'text-xs font-bold rounded-xl p-3 text-emerald-900 bg-emerald-50 border border-emerald-200';
+                box.innerHTML = `本次换汇约合 ¥${thisTimeCNY.toFixed(2)}，换汇后预计还剩约 <strong>¥${afterThis.toFixed(2)}</strong> 年度额度可用。<div class="text-[10px] font-normal mt-1 opacity-80">*参考额度按约5万美元估算，实际以银行规定为准</div>`;
+            }
+        }
+
+        // 今日汇率位置：基于近30天区间给出相对位置，描述性参考，不做涨跌预测
+        function calcRateGauge() {
+            const box = document.getElementById('rate-gauge-result');
+            if (!box) return;
+            const data = trendDataMap['30d'];
+            const max30 = Math.max(...data.values);
+            const min30 = Math.min(...data.values);
+            const pos = max30 === min30 ? 0.5 : (currentRateCNY - min30) / (max30 - min30);
+
+            box.classList.remove('hidden');
+            if (pos <= 0.3) {
+                box.className = 'text-xs font-bold rounded-xl p-3 border-2 text-emerald-900 bg-emerald-50 border-emerald-300';
+                box.innerHTML = '<div class="font-black text-sm mb-1">🟢 近30天相对低位</div>当前汇率处于近30天较低区间，如果本来就有换汇计划，可以考虑趁这个区间分批建仓。<div class="text-[10px] opacity-70 mt-2 font-normal">*仅基于近30天区间位置的简单参考，不构成投资建议，不代表未来走势预测</div>';
+            } else if (pos >= 0.7) {
+                box.className = 'text-xs font-bold rounded-xl p-3 border-2 text-rose-900 bg-rose-50 border-rose-300';
+                box.innerHTML = '<div class="font-black text-sm mb-1">🔴 近30天相对高位</div>当前汇率处于近30天较高区间，如果不是必须马上用钱，可以再观察观察。<div class="text-[10px] opacity-70 mt-2 font-normal">*仅基于近30天区间位置的简单参考，不构成投资建议，不代表未来走势预测</div>';
+            } else {
+                box.className = 'text-xs font-bold rounded-xl p-3 border-2 text-amber-900 bg-amber-50 border-amber-300';
+                box.innerHTML = '<div class="font-black text-sm mb-1">🟡 近30天中间区间</div>当前汇率处于近30天中间位置，波动比较平缓，按原计划分批换汇即可。<div class="text-[10px] opacity-70 mt-2 font-normal">*仅基于近30天区间位置的简单参考，不构成投资建议，不代表未来走势预测</div>';
+            }
+        }
+
+        // 我的换汇战报：用真实账本数据算加权成本，对比基准是"近30天最高点一次性换清"（同一份模拟市场数据），不虚构其他用户的排名对比
+        function renderBattleReport() {
+            const card = document.getElementById('battle-report-card');
+            if (!card) return;
+
+            if (!records || records.length === 0) {
+                card.innerHTML = `<h3 class="font-black text-sm text-amber-900">🏆 我的换汇战报</h3><p class="text-[11px] text-amber-700/80 mt-1">记满账单后自动生成，跟"如果全部在近30天高点换清"比一比。</p><p class="text-xs text-amber-600 mt-3">还没有换汇记录，先去上面的账本记一笔吧～</p>`;
+                return;
+            }
+
+            const totalGbp = records.reduce((sum, r) => sum + r.gbp, 0);
+            const totalCny = records.reduce((sum, r) => sum + r.cny, 0);
+            const avgRate = totalCny / totalGbp;
+            const data = trendDataMap['30d'];
+            const max30 = Math.max(...data.values);
+            const worstCaseCny = totalGbp * max30;
+            const saved = worstCaseCny - totalCny;
+
+            if (saved > 0) {
+                card.innerHTML = `
+                    <div class="text-2xl mb-1">🏆</div>
+                    <h3 class="font-black text-sm text-amber-900">我的换汇战报</h3>
+                    <p class="text-xs text-amber-800 mt-2 leading-relaxed">累计分 <strong>${records.length}</strong> 批换汇 <strong>£${totalGbp.toFixed(2)}</strong>，加权平均成本 <strong>${avgRate.toFixed(4)}</strong>。相比在近30天最高点（${max30.toFixed(4)}）一次性换清，预计省下约 <strong class="text-emerald-700">¥${saved.toFixed(2)}</strong>！</p>
+                    <p class="text-[10px] text-amber-500 mt-2">*对比基准为近30天区间最高价（模拟市场数据），非真实用户间排名对比</p>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="text-2xl mb-1">📒</div>
+                    <h3 class="font-black text-sm text-amber-900">我的换汇战报</h3>
+                    <p class="text-xs text-amber-800 mt-2 leading-relaxed">累计分 <strong>${records.length}</strong> 批换汇 <strong>£${totalGbp.toFixed(2)}</strong>，加权平均成本 <strong>${avgRate.toFixed(4)}</strong>。继续观察汇率，下次争取换在更低点！</p>
+                `;
+            }
+        }
+
+        // 海淘到手价：折扣后商品价 + 运费，再按税率估算人民币成本
+        function calcHaitao() {
+            const price = parseFloat(document.getElementById('haitao-price').value) || 0;
+            const discount = Math.max(0, Math.min(100, parseFloat(document.getElementById('haitao-discount').value) || 100));
+            const shipping = parseFloat(document.getElementById('haitao-shipping').value) || 0;
+            const tax = Math.max(0, parseFloat(document.getElementById('haitao-tax').value) || 0);
+            if (price <= 0) { alert('请先填写商品价格哦！'); return; }
+            const subtotal = price * discount / 100 + shipping;
+            const landed = subtotal * (1 + tax / 100);
+            const cny = landed * currentRateCNY;
+            const result = document.getElementById('haitao-result');
+            result.innerHTML = `预计到手价：<strong class="font-mono text-base">£${landed.toFixed(2)}</strong>（约 ¥${cny.toFixed(2)}）<span class="block text-xs font-normal mt-1">已按当前 GBP/CNY ${currentRateCNY.toFixed(4)} 估算，实际以入账汇率为准。</span>`;
+            result.classList.remove('hidden');
+        }
+
+        function calcTravel() {
+            const days = Math.max(1, parseInt(document.getElementById('travel-days').value) || 1);
+            const daily = Math.max(0, parseFloat(document.getElementById('travel-daily').value) || 0);
+            const cash = Math.max(0, parseFloat(document.getElementById('travel-cash').value) || 0);
+            const total = days * daily + cash;
+            const result = document.getElementById('travel-result');
+            result.innerHTML = `建议准备 <strong class="font-mono text-base">£${total.toFixed(2)}</strong>（约 ¥${(total * currentRateCNY).toFixed(2)}）<span class="block text-xs font-normal mt-1">其中每日消费 £${daily.toFixed(0)} × ${days} 天，备用现金 £${cash.toFixed(0)}。</span>`;
+            result.classList.remove('hidden');
+        }
+
+        function addHaitaoOrder() {
+            const name = document.getElementById('haitao-order-name').value.trim();
+            const amount = parseFloat(document.getElementById('haitao-order-amount').value) || 0;
+            if (!name || amount <= 0) { alert('请填写商品名称和金额'); return; }
+            const orders = JSON.parse(localStorage.getItem('ps_haitao_orders') || '[]');
+            orders.unshift({name, amount, date:new Date().toLocaleDateString('zh-CN')}); localStorage.setItem('ps_haitao_orders', JSON.stringify(orders.slice(0,8)));
+            document.getElementById('haitao-order-name').value=''; document.getElementById('haitao-order-amount').value=''; renderHaitaoOrders();
+        }
+        function renderHaitaoOrders() { const box=document.getElementById('haitao-orders'); if(!box)return; const orders=JSON.parse(localStorage.getItem('ps_haitao_orders')||'[]'); box.innerHTML=orders.length?orders.map(o=>`<div class="flex justify-between items-center bg-amber-50 border border-amber-100 rounded-xl px-3 py-2"><span>${o.name}<small class="block text-[10px] text-amber-500">${o.date||'—'}</small></span><strong class="font-mono">£${o.amount.toFixed(2)}</strong></div>`).join(''):'<div class="text-amber-600">还没有订单记录</div>'; }
+        function calcTravelSplit() { const days=Math.max(1,parseInt(document.getElementById('travel-days').value)||1), daily=parseFloat(document.getElementById('travel-daily').value)||0, total=days*daily, f=parseFloat(document.getElementById('travel-food').value)||0,t=parseFloat(document.getElementById('travel-transport').value)||0,k=parseFloat(document.getElementById('travel-ticket').value)||0; const r=document.getElementById('travel-split-result'); r.innerHTML=`餐饮 £${(total*f/100).toFixed(2)} · 交通 £${(total*t/100).toFixed(2)} · 门票 £${(total*k/100).toFixed(2)}（分类合计 £${(total*(f+t+k)/100).toFixed(2)}）`; r.classList.remove('hidden'); }
+        function comparePay(){const b=+document.getElementById('pay-bank').value||0,p=+document.getElementById('pay-paypal').value||0,m=+document.getElementById('pay-markup').value||0;const bank=b+m,pay=p+m;document.getElementById('pay-result').textContent=`银行卡综合成本约 ${bank.toFixed(2)}%，PayPal 约 ${pay.toFixed(2)}%，建议使用 ${bank<=pay?'银行卡':'PayPal'}。`;}
+        function calcDcc(){const g=+document.getElementById('dcc-gbp').value||0,d=+document.getElementById('dcc-rate').value||0;const extra=Math.max(0,(d-currentRateCNY)*g);document.getElementById('dcc-result').textContent=`选择人民币结算预计多花 ¥${extra.toFixed(2)}，建议选择 GBP。`;}
+
+        async function fetchRealtimeRates() {
+            try {
+                const res = await fetch('https://open.er-api.com/v6/latest/GBP');
+                const data = await res.json();
+                if (data && data.rates) {
+                    currentRateCNY = data.rates.CNY;
+                    document.getElementById('rate-cny').innerText = currentRateCNY.toFixed(4);
+                    document.getElementById('rate-usd').innerText = data.rates.USD.toFixed(4);
+                    document.getElementById('rate-eur').innerText = data.rates.EUR.toFixed(4);
+                    checkTargetPriceAlert();
+                    updateCalculations();
+                    renderRadarChart();
+                    calcRateGauge();
+                }
+            } catch (e) {
+                currentRateCNY = 9.1131;
+                document.getElementById('rate-cny').innerText = "9.1131";
+                document.getElementById('rate-usd').innerText = "1.2710";
+                document.getElementById('rate-eur').innerText = "1.1680";
+                checkTargetPriceAlert();
+                renderRadarChart();
+                calcRateGauge();
+            }
+        }
+
+        function saveTargetPrice() {
+            const val = parseFloat(document.getElementById('input-target-price').value);
+            if (!val || val <= 0) {
+                alert('请输入有效的心理目标价！');
+                return;
+            }
+            targetPrice = val;
+            localStorage.setItem(nsKey('ps_target_price'), targetPrice.toString());
+            alert(`盯盘成功！当汇率跌破或等于 ${targetPrice.toFixed(4)} 时, 肖恩会立刻敲响警报！`);
+            checkTargetPriceAlert();
+            renderRadarChart();
+        }
+
+        function checkTargetPriceAlert() {
+            if (targetPrice > 0 && currentRateCNY <= targetPrice) {
+                document.getElementById('alert-current-rate').innerText = currentRateCNY.toFixed(4);
+                document.getElementById('alert-msg').innerText = `太棒了！当前汇率 (${currentRateCNY.toFixed(4)}) 已达到或低于你设定的心理价位 (${targetPrice.toFixed(4)})！`;
+                const modal = document.getElementById('alert-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                triggerCoinEffect();
+            }
+        }
+
+        function closeAlertModal() {
+            const modal = document.getElementById('alert-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function addRecord(e) {
+            const gbpInput = document.getElementById('input-gbp');
+            const rateInput = document.getElementById('input-rate');
+
+            const gbp = parseFloat(gbpInput.value);
+            const rate = parseFloat(rateInput.value);
+
+            if (!gbp || !rate || gbp <= 0 || rate <= 0) {
+                alert('请准确填入金额与汇率哦！');
+                return;
+            }
+
+            records.push({ id: Date.now(), date: new Date().toLocaleDateString('zh-CN'), gbp, rate, cny: gbp * rate });
+            localStorage.setItem(nsKey('ps_records'), JSON.stringify(records));
+
+            gbpInput.value = '';
+            rateInput.value = '';
+
+            renderRecords();
+            renderBattleReport();
+            renderRadarChart();
+            triggerCoinEffect(e);
+        }
+
+        function deleteRecord(id) {
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem(nsKey('ps_records'), JSON.stringify(records));
+            renderRecords();
+            renderBattleReport();
+            renderRadarChart();
+        }
+
+        function renderRecords() {
+            const tbody = document.getElementById('records-table-body');
+            tbody.innerHTML = '';
+
+            records.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-amber-50/50 transition";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-mono font-bold text-amber-900">£${r.gbp.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-amber-700">${r.date || '—'}</td>
+                    <td class="py-2.5 px-3 font-mono text-amber-800">${r.rate.toFixed(4)}</td>
+                    <td class="py-2.5 px-3 font-mono text-amber-800">¥${r.cny.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-right">
+                        <button onclick="deleteRecord(${r.id})" class="text-rose-500 hover:text-rose-700 font-bold">清理</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            let totalGBP = 0;
+            let totalCNY = 0;
+
+            records.forEach(r => {
+                totalGBP += r.gbp;
+                totalCNY += r.cny;
+            });
+
+            document.getElementById('stat-total-gbp').innerText = `£${totalGBP.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('stat-total-cny').innerText = `¥${totalCNY.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            const visualCard = document.getElementById('visual-impact-card');
+            const visualText = document.getElementById('visual-impact-text');
+            const achBanner = document.getElementById('achievement-banner');
+
+            if (totalGBP > 0) {
+                const avgRate = totalCNY / totalGBP;
+                document.getElementById('stat-avg-rate').innerText = avgRate.toFixed(4);
+
+                const diff = (currentRateCNY - avgRate) * totalGBP;
+                const diffElem = document.getElementById('stat-diff');
+                
+                visualCard.classList.remove('hidden');
+
+                if (diff >= 0) {
+                    const savedCNY = Math.abs(diff);
+                    diffElem.innerText = `+¥${savedCNY.toFixed(2)}`;
+                    diffElem.className = "text-base font-black font-mono text-emerald-600";
+                    
+                    achBanner.classList.remove('hidden');
+                    document.getElementById('achievement-title').innerText = `肖恩帮你锁住了低价，成功省下了 ¥${savedCNY.toFixed(2)} 人民币！`;
+
+                    if (currentMode === 'student') {
+                        const coffees = Math.floor(savedCNY / 35);
+                        const trainTickets = (savedCNY / 450).toFixed(1);
+                        const coffeeText = coffees > 0 ? `相当于免费喝 <strong class="text-orange-600">${coffees} 杯星巴克</strong>` : `距离一杯星巴克还差 <strong class="text-orange-600">¥${(35-savedCNY).toFixed(2)}</strong>`;
+                        const ticketText = parseFloat(trainTickets) >= 1 ? `或换了 <strong class="text-orange-600">${trainTickets} 张伦敦到爱丁堡单程火车票</strong>` : `距离一张火车票还差 <strong class="text-orange-600">¥${(450-savedCNY).toFixed(2)}</strong>`;
+                        visualText.innerHTML = `肖恩为你省下了 <strong class="text-emerald-600 font-mono">¥${savedCNY.toFixed(2)}</strong>！${coffeeText}，${ticketText} 🎟️`;
+                    } else if (currentMode === 'haitao') {
+                        const shoppingText = savedCNY >= 300 ? `相当于省下一件约 <strong class="text-orange-600">¥300</strong> 的海淘好物` : `距离免掉一笔约 ¥300 的海淘运费还差 <strong class="text-orange-600">¥${(300-savedCNY).toFixed(2)}</strong>`;
+                        visualText.innerHTML = `持仓成本低于当前市价，赚到了 <strong class="text-emerald-600 font-mono">¥${savedCNY.toFixed(2)}</strong>！${shoppingText} 🛍️`;
+                    } else {
+                        const meals = Math.floor(savedCNY / 150);
+                        const mealText = meals > 0 ? `相当于免费吃 <strong class="text-orange-600">${meals} 顿全套英式早餐</strong>` : `距离一顿英式早餐还差 <strong class="text-orange-600">¥${(150-savedCNY).toFixed(2)}</strong>`;
+                        visualText.innerHTML = `肖恩夸你换汇时机选得好，省下 <strong class="text-emerald-600 font-mono">¥${savedCNY.toFixed(2)}</strong>，${mealText} 🍳`;
+                    }
+                } else {
+                    const lostCNY = Math.abs(diff);
+                    diffElem.innerText = `-¥${lostCNY.toFixed(2)}`;
+                    diffElem.className = "text-base font-black font-mono text-rose-500";
+                    achBanner.classList.add('hidden');
+                    visualText.innerHTML = `目前加权成本稍高了 <strong class="text-rose-500 font-mono">¥${lostCNY.toFixed(2)}</strong>。别急，等回调时让肖恩陪你分批补仓拉低均线！`;
+                }
+            } else {
+                document.getElementById('stat-avg-rate').innerText = "0.0000";
+                document.getElementById('stat-diff').innerText = "--";
+                document.getElementById('stat-diff').className = "text-base font-black font-mono text-slate-400";
+                visualCard.classList.add('hidden');
+                achBanner.classList.add('hidden');
+            }
+        }
+
+        function triggerCoinEffect(e) {
+            confetti({
+                particleCount: 60,
+                spread: 70,
+                origin: { y: 0.35 },
+                colors: ['#f59e0b', '#10b981', '#3b82f6', '#ec4899']
+            });
+
+            const emojis = ['🐑', '🪙', '💷', '✨', '🕶️'];
+            for (let i = 0; i < 15; i++) {
+                createEmojiParticle(emojis[Math.floor(Math.random() * emojis.length)]);
+            }
+        }
+
+        function createEmojiParticle(emojiText) {
+            const el = document.createElement('div');
+            el.innerText = emojiText;
+            el.style.position = 'fixed';
+            el.style.zIndex = '9999';
+            el.style.left = '50%';
+            el.style.top = '35%';
+            el.style.fontSize = `${Math.random() * 20 + 42}px`;
+            el.style.pointerEvents = 'none';
+            el.style.filter = 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 15px #fbbf24)';
+            el.style.transition = 'all 1.0s cubic-bezier(0.15, 0.85, 0.35, 1.2)';
+            el.style.transform = 'translate(-50%, -50%) scale(0.2)';
+            el.style.opacity = '1';
+            
+            document.body.appendChild(el);
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 260 + 100;
+            const x = Math.cos(angle) * velocity;
+            const y = Math.sin(angle) * velocity - 40; 
+
+            requestAnimationFrame(() => {
+                el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1.8) rotate(${Math.random() * 360}deg)`;
+                el.style.opacity = '1';
+            });
+
+            setTimeout(() => {
+                el.style.opacity = '0';
+            }, 750);
+
+            setTimeout(() => {
+                el.remove();
+            }, 1000);
+        }
+
+        function switchTrendPeriod(period) {
+            currentPeriod = period;
+            ['7d', '30d', '3m', '6m', '1y'].forEach(p => {
+                const btn = document.getElementById(`period-${p}`);
+                if (p === period) {
+                    btn.className = "px-2.5 py-1 rounded-lg transition bg-amber-400 text-amber-950 font-black whitespace-nowrap";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded-lg transition text-amber-800 hover:bg-amber-200/50 whitespace-nowrap";
+                }
+            });
+            initTrendChart(period);
+        }
+
+        function setMAPeriod(days) {
+            currentMAPeriod = days;
+            [3, 5, 10].forEach(d => {
+                const btn = document.getElementById(`ma-btn-${d}`);
+                if (btn) {
+                    if (d === days) {
+                        btn.className = "px-2.5 py-1 rounded-lg bg-amber-400 text-amber-950 font-black transition";
+                    } else {
+                        btn.className = "px-2.5 py-1 rounded-lg text-amber-800 hover:bg-amber-200/50 transition";
+                    }
+                }
+            });
+            initTrendChart(currentPeriod);
+        }
+
+        function calculateMA(dataArray, dayCount) {
+            let result = [];
+            for (let i = 0, len = dataArray.length; i < len; i++) {
+                if (i < dayCount - 1) {
+                    result.push(null);
+                    continue;
+                }
+                let sum = 0;
+                for (let j = 0; j < dayCount; j++) {
+                    sum += dataArray[i - j];
+                }
+                result.push(Number((sum / dayCount).toFixed(4)));
+            }
+            return result;
+        }
+
+        function initTrendChart(period = '7d') {
+            const chartDom = document.getElementById('chart-trend');
+            if (!chartDom) return;
+            if (!trendChart) {
+                trendChart = echarts.init(chartDom);
+            }
+            const dataConfig = trendDataMap[period];
+            dataConfig.values[dataConfig.values.length - 1] = currentRateCNY;
+
+            const maData = calculateMA(dataConfig.values, currentMAPeriod);
+
+            trendChart.setOption({
+                tooltip: { trigger: 'axis' },
+                legend: { data: ['GBP/CNY', `MA${currentMAPeriod} 均线`], textStyle: { fontSize: 10, color: '#92400e' }, top: 0 },
+                grid: { left: '2%', right: '2%', bottom: '0%', top: '15%', containLabel: true },
+                xAxis: { type: 'category', data: dataConfig.labels, axisLabel: { color: '#92400e', fontSize: 10 } },
+                yAxis: { type: 'value', min: dataConfig.min, max: dataConfig.max, axisLabel: { color: '#92400e', fontSize: 10 }, splitLine: { lineStyle: { color: '#fef3c7' } } },
+                series: [
+                    {
+                        name: 'GBP/CNY',
+                        type: 'line',
+                        smooth: true,
+                        data: dataConfig.values,
+                        itemStyle: { color: '#f59e0b' },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'rgba(245, 158, 11, 0.4)' },
+                                { offset: 1, color: 'rgba(245, 158, 11, 0.0)' }
+                            ])
+                        }
+                    },
+                    {
+                        name: `MA${currentMAPeriod} 均线`,
+                        type: 'line',
+                        smooth: true,
+                        data: maData,
+                        itemStyle: { color: '#3b82f6' },
+                        lineStyle: { type: 'dashed', width: 2 }
+                    }
+                ]
+            });
+            window.addEventListener('resize', () => trendChart && trendChart.resize());
+        }
+
+        // 自定义头像持久化处理
+        function handleCustomAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    localStorage.setItem('ps_user_avatar', base64Image);
+                    applyAvatar(base64Image);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyAvatar(dataUrl) {
+            const avatarBg = document.getElementById('user-avatar-bg');
+            if (avatarBg) {
+                avatarBg.style.backgroundImage = `url('${dataUrl}')`;
+                avatarBg.style.backgroundSize = 'cover';
+                avatarBg.style.backgroundPosition = 'center';
+                avatarBg.innerText = '';
+            }
+        }
+
+        function createTrendLineAnimation(type, event) {
+            const btn = type === 'up' ? document.getElementById('btn-up') : document.getElementById('btn-down');
+            if (!btn) return;
+            const rect = btn.getBoundingClientRect();
+            
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.style.position = "fixed";
+            svg.style.inset = "0";
+            svg.style.width = "100vw";
+            svg.style.height = "100vh";
+            svg.style.pointerEvents = "none";
+            svg.style.zIndex = "9999";
+
+            const isUp = type === 'up';
+            const lineColor = isUp ? "#10b981" : "#f43f5e";
+            const shadowColor = isUp ? "rgba(16, 185, 129, 0.4)" : "rgba(244, 63, 94, 0.4)";
+
+            const endY = isUp ? startY - 140 : startY + 140;
+            const midX1 = startX + 40;
+            const midY1 = isUp ? startY - 30 : startY + 30;
+            const midX2 = startX + 70;
+            const midY2 = isUp ? startY - 10 : startY + 10;
+            const endX = startX + 130;
+
+            const pathD = `M ${startX} ${startY} L ${midX1} ${midY1} L ${midX2} ${midY2} L ${endX} ${endY}`;
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", pathD);
+            path.setAttribute("stroke", lineColor);
+            path.setAttribute("stroke-width", "6");
+            path.setAttribute("fill", "none");
+            path.setAttribute("stroke-linecap", "round");
+            path.setAttribute("stroke-linejoin", "round");
+            path.setAttribute("class", "trend-line-path");
+            path.style.filter = `drop-shadow(0 0 10px ${shadowColor})`;
+
+            svg.appendChild(path);
+            document.body.appendChild(svg);
+
+            setTimeout(() => {
+                const icon = document.createElement("div");
+                icon.innerText = isUp ? "📈" : "📉";
+                icon.style.position = "fixed";
+                icon.style.left = `${endX}px`;
+                icon.style.top = `${endY}px`;
+                icon.style.transform = "translate(-50%, -50%) scale(0)";
+                icon.style.fontSize = "36px";
+                icon.style.zIndex = "10000";
+                icon.style.pointerEvents = "none";
+                icon.style.transition = "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s";
+                
+                document.body.appendChild(icon);
+
+                requestAnimationFrame(() => {
+                    icon.style.transform = "translate(-50%, -50%) scale(1.4)";
+                });
+
+                setTimeout(() => {
+                    icon.style.opacity = "0";
+                    svg.style.transition = "opacity 0.5s";
+                    svg.style.opacity = "0";
+                    setTimeout(() => {
+                        icon.remove();
+                        svg.remove();
+                    }, 500);
+                }, 1000);
+            }, 600);
+        }
+
+        // ===== 🎯 时机评估雷达：五个维度全部基于真实数据计算，不再是写死的假分数 =====
+        let radarChart = null;
+
+        // 汇率低位：当前汇率相对近30天区间的位置，越靠近低点分数越高
+        function scoreRateLow() {
+            const data = trendDataMap['30d'];
+            const max30 = Math.max(...data.values);
+            const min30 = Math.min(...data.values);
+            if (max30 === min30) return 50;
+            const pos = (currentRateCNY - min30) / (max30 - min30);
+            return clampScore((1 - pos) * 100);
+        }
+
+        // 波动适宜：近30天振幅相对均价的比例，振幅越小（越平稳）分数越高
+        function scoreVolatility() {
+            const data = trendDataMap['30d'];
+            const max30 = Math.max(...data.values);
+            const min30 = Math.min(...data.values);
+            const mid = (max30 + min30) / 2;
+            const amplitudePct = mid === 0 ? 0 : ((max30 - min30) / mid) * 100;
+            return clampScore(100 - amplitudePct * 10);
+        }
+
+        // 持仓成本：你的加权换汇成本相对近30天区间的位置，成本越靠近低点分数越高；没有记录时给中性分并说明
+        function scorePositionCost() {
+            if (!records || records.length === 0) return { score: 50, note: '暂无换汇记录，此项为中性默认值' };
+            const totalGbp = records.reduce((s, r) => s + r.gbp, 0);
+            const totalCny = records.reduce((s, r) => s + r.cny, 0);
+            const avgRate = totalCny / totalGbp;
+            const data = trendDataMap['30d'];
+            const max30 = Math.max(...data.values);
+            const min30 = Math.min(...data.values);
+            if (max30 === min30) return { score: 50, note: '' };
+            const pos = (avgRate - min30) / (max30 - min30);
+            return { score: clampScore((1 - pos) * 100), note: '' };
+        }
+
+        // 补仓空间：当前汇率相对你设置的目标价还有多少差距，越接近或低于目标价分数越高；未设置目标价时给中性分并说明
+        function scoreRoomToAdd() {
+            if (!targetPrice || targetPrice <= 0) return { score: 50, note: '未设置目标价，此项为中性默认值' };
+            const gapPct = ((targetPrice - currentRateCNY) / targetPrice) * 100;
+            return { score: clampScore(50 + gapPct * 20), note: '' };
+        }
+
+        function clampScore(v) {
+            return Math.max(0, Math.min(100, Math.round(v * 10) / 10));
+        }
+
+        // 汇总计算五个维度，羊毛指数为综合分（前四项平均），同时也是"今日适宜指数"
+        function computeRadarScores() {
+            const rateLow = scoreRateLow();
+            const volatility = scoreVolatility();
+            const posCost = scorePositionCost();
+            const roomToAdd = scoreRoomToAdd();
+            const composite = clampScore((rateLow + volatility + posCost.score + roomToAdd.score) / 4);
+            return {
+                values: [rateLow, volatility, posCost.score, roomToAdd.score, composite],
+                composite,
+                notes: [posCost.note, roomToAdd.note].filter(Boolean)
+            };
+        }
+
+        function initRadarChart() {
+            const chartDom = document.getElementById('chart-radar');
+            if (!chartDom) return;
+            radarChart = echarts.init(chartDom);
+            renderRadarChart();
+            window.addEventListener('resize', () => radarChart && radarChart.resize());
+        }
+
+        // 每次汇率、账本或目标价变化后调用，重新计算并刷新雷达图
+        function renderRadarChart() {
+            if (!radarChart) return;
+            const result = computeRadarScores();
+
+            radarChart.setOption({
+                radar: {
+                    indicator: [
+                        { name: '汇率低位', max: 100 },
+                        { name: '波动适宜', max: 100 },
+                        { name: '持仓成本', max: 100 },
+                        { name: '补仓空间', max: 100 },
+                        { name: '羊毛指数', max: 100 }
+                    ],
+                    shape: 'polygon',
+                    radius: '60%',
+                    axisName: { color: '#78350f', fontWeight: 'bold', fontSize: 10 },
+                    splitLine: { lineStyle: { color: '#fde68a' } },
+                    splitArea: { show: false },
+                    axisLine: { lineStyle: { color: '#fde68a' } }
+                },
+                series: [{
+                    name: '羊毛雷达',
+                    type: 'radar',
+                    data: [{
+                        value: result.values,
+                        itemStyle: { color: '#f59e0b' },
+                        areaStyle: { color: 'rgba(245, 158, 11, 0.35)' }
+                    }]
+                }]
+            });
+
+            const scoreEl = document.getElementById('radar-composite-score');
+            if (scoreEl) scoreEl.textContent = result.composite.toFixed(1) + ' 分';
+
+            const noteEl = document.getElementById('radar-composite-note');
+            if (noteEl) noteEl.textContent = result.notes.length ? '*' + result.notes.join('；') : '';
+        }
+
+        function loadVoteState() {
+            const voteState = localStorage.getItem(nsKey('ps_vote_today'));
+            const streakCountElem = document.getElementById('streak-count');
+            if (streakCountElem) streakCountElem.innerText = streak;
+
+            const titleElem = document.getElementById('user-title');
+            if (titleElem) {
+                if (streak >= 7) titleElem.innerText = "肖恩的首席牧羊官 👑";
+                else if (streak >= 3) titleElem.innerText = "资深羊毛猎手 🏹";
+                else titleElem.innerText = "牧羊新手 🐑";
+            }
+
+            const statusBox = document.getElementById('vote-status');
+            if (statusBox) {
+                if (voteState) {
+                    const isUp = voteState === 'up';
+                    const text = isUp ? '📈 明天看涨！' : '📉 明天看跌！';
+                    statusBox.innerText = `今日已打卡：${text}`;
+                    statusBox.className = `text-xs font-black p-2.5 rounded-xl text-center border-2 ${
+                        isUp
+                        ? 'text-emerald-900 bg-emerald-100 border-emerald-400 pulse-glow-up'
+                        : 'text-rose-900 bg-rose-100 border-rose-400 pulse-glow-down'
+                    }`;
+                } else {
+                    // 切换到还没投过票的身份时，恢复为初始待投票状态
+                    statusBox.innerText = '今天还没有预测哦';
+                    statusBox.className = 'text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-center transition-all duration-300';
+                }
+            }
+        }
+
+        function openShareModal() {
+            const modal = document.getElementById('share-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const now = new Date();
+            document.getElementById('card-date').innerText = now.toISOString().split('T')[0];
+            document.getElementById('card-gbp').innerText = document.getElementById('stat-total-gbp').innerText;
+            document.getElementById('card-cost').innerText = document.getElementById('stat-avg-rate').innerText;
+            document.getElementById('card-result').innerText = document.getElementById('stat-diff').innerText;
+            document.getElementById('card-impact').innerHTML = document.getElementById('visual-impact-text').innerHTML;
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('share-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function updateWoolCoinDisplay() {
+            const woolCoinsElem = document.getElementById('wool-coins');
+            if (woolCoinsElem) woolCoinsElem.innerText = woolCoins;
+            const modalCoins = document.getElementById('modal-wool-coins');
+            if(modalCoins) modalCoins.innerText = woolCoins;
+            localStorage.setItem(nsKey('ps_wool_coins'), woolCoins.toString());
+        }
+
+        function vote(type, event) {
+            const existingVote = localStorage.getItem(nsKey('ps_vote_today'));
+            if (existingVote) {
+                alert('今天已经投过票啦，明天再来赚牧羊币吧！');
+                return;
+            }
+
+            localStorage.setItem(nsKey('ps_vote_today'), type);
+            streak += 1;
+            localStorage.setItem(nsKey('ps_streak'), streak.toString());
+
+            woolCoins += 20;
+            updateWoolCoinDisplay();
+            updateFarmProgress(streak);
+
+            createTrendLineAnimation(type, event);
+            loadVoteState();
+            triggerCoinEffect(event);
+        }
+
+        function openWoolShop() {
+            updateWoolCoinDisplay();
+            const modal = document.getElementById('wool-shop-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeWoolShop() {
+            const modal = document.getElementById('wool-shop-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function exchangeSkin(cost) {
+            if (woolCoins >= cost) {
+                woolCoins -= cost;
+                updateWoolCoinDisplay();
+                alert('🎉 兑换成功！肖恩已经穿上了新装备，快去看看吧！');
+                closeWoolShop();
+                triggerCoinEffect();
+            } else {
+                alert('❌ 牧羊币不足哦，快去多记几笔账或者坚持每日打卡赚取吧！');
+            }
+        }
+
+        const shaunQuotes = [
+            { title: "💡 汇率避坑指南", content: "“今日英镑小跌，适合小酌一杯，但不适合大笔换汇哦！”" },
+            { title: "🐑 牧羊人日记", content: "“走得慢没关系，只要每天都在记账，小羊的草料就不会断！”" },
+            { title: "🎯 肖恩理财哲学", content: "“把每一笔花销都记下来，就是对钱包最好的放牧。”" },
+            { title: "🚀 财富小贴士", content: "“连续打卡不仅能让牧场升级，还能让你的财务直觉变得像肖恩一样敏锐！”" }
+        ];
+
+        function openCheckinModal() {
+            const modal = document.getElementById('checkin-modal');
+            
+            document.getElementById('modal-streak').innerText = streak;
+            
+            const randomQuote = shaunQuotes[Math.floor(Math.random() * shaunQuotes.length)];
+            document.getElementById('quote-title').innerText = randomQuote.title;
+            document.getElementById('quote-content').innerText = randomQuote.content;
+
+            updateFarmProgress(streak);
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCheckinModal() {
+            const modal = document.getElementById('checkin-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function updateFarmProgress(currentStreak) {
+            const progressBar = document.getElementById('farm-progress-bar');
+            const progressText = document.getElementById('farm-progress-text');
+            const levelName = document.getElementById('farm-level-name');
+
+            let maxDays = 100;
+            if (currentStreak > 100) maxDays = 365;
+
+            let percent = Math.min(Math.floor((currentStreak / maxDays) * 100), 100);
+            if(progressBar) progressBar.style.width = percent + '%';
+            if(progressText) progressText.innerText = `${currentStreak} / ${maxDays} 天`;
+
+            if (currentStreak >= 100) {
+                if(levelName) levelName.innerText = "豪华大牧场 🏰";
+            } else if (currentStreak >= 30) {
+                if(levelName) levelName.innerText = "中级青草牧场 🌾";
+            } else {
+                if(levelName) levelName.innerText = "小型羊圈 🛖";
+            }
+        }
+
+        function shareReport() {
+            alert('📸 战报海报已生成！快去分享到朋友圈或小红书，让朋友们看看你的牧场吧！');
+        }
+    </script>
+</body>
+</html>
